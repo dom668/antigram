@@ -15,7 +15,6 @@ class InstagramAutomation:
         self.username = username
         self.password = password
 
-        # oh yeah
         
         # Set up the Chrome driver with options
         self.options = webdriver.ChromeOptions()
