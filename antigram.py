@@ -168,12 +168,41 @@ class InstagramAutomation:
         except:
             print("dint work")
 
-    def open_most_recent_post(self):
+    def click_middle_of_screen(self):
+        print("trying to click middle")
         actions = ActionChains(self.driver)
         try:
-            actions.pointer_action.move_to_location(0, 0)
-            actions.perform()
-            print("moved to top left corner")
+            window_width = self.driver.execute_script("return window.innerWidth")
+            window_height = self.driver.execute_script("return window.innerHeight")
+
+            center_x = window_width // 2
+            center_y = window_height // 2
+
+            actions = ActionChains(self.driver)
+            actions.move_by_offset(center_x, center_y).perform()
+
+            actions.click().perform()
+            
+        except:
+            print("brok it")
+
+    def click_most_recent_post(self):
+        print("trying to click middle")
+        actions = ActionChains(self.driver)
+        try:
+            window_width = self.driver.execute_script("return window.innerWidth")
+            window_height = self.driver.execute_script("return window.innerHeight")
+
+            center_x = window_width // 2
+            center_y = window_height // 2
+
+            print(center_x)
+            print(center_y)
+
+            actions = ActionChains(self.driver)
+            actions.move_by_offset(center_x, center_y-250).perform()
+
+            actions.click().perform()
             
         except:
             print("brok it")
@@ -192,8 +221,8 @@ def main():
 
 
     # Replace with your Instagram credentials
-    username = "sheffskatesoc"
-    password = "j£h38qH/65f"
+    username = "back180stylin"
+    password = "hardskat3SC3n3"
     
     # Initialize the automation
     instagram_bot = InstagramAutomation(username, password)
@@ -203,12 +232,11 @@ def main():
         # Perform the actions
         if instagram_bot.login():
             time.sleep(1)  # Wait a moment after login
-
             instagram_bot.dont_save_login()
-            instagram_bot.go_to_account("kier.struthers")
-            instagram_bot.message_viewed_account()
-            instagram_bot.send_message()
-            instagram_bot.open_most_recent_post()
+            instagram_bot.go_to_account("freeskatemag")
+            time.sleep(1)
+            instagram_bot.click_most_recent_post()
+
         
     except Exception as e:
         print(f"An error occurred: {e}")
