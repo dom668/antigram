@@ -6,14 +6,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-
-driver = webdriver.Chrome()
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 class InstagramAutomation:
     def __init__(self, username, password):
         """Initialize the Instagram automation with user credentials."""
         self.username = username
         self.password = password
+
+        self.base_url = "https://www.instagram.com/"
 
         
         # Set up the Chrome driver with options
@@ -26,9 +28,12 @@ class InstagramAutomation:
         self.wait = WebDriverWait(self.driver, 10)
         
     def login(self):
+        
+        self.driver.maximize_window() # in fullscreen mode the buttons have text as well
+
         try:
             print("Navigating to Instagram...")
-            self.driver.get("https://www.instagram.com/")
+            self.driver.get(self.base_url)
             
             # Wait for the page to load and accept cookies if prompted
             try:
@@ -41,6 +46,7 @@ class InstagramAutomation:
                 #print("No cookie banner found or it already has been accepted.")
                 pass
             
+
             # Find the username and password input fields
             # print("Logging in...")
             username_input = self.wait.until(
@@ -60,7 +66,7 @@ class InstagramAutomation:
             )
             login_button.click()
 
-            time.sleep(2)
+            time.sleep(1)
             
             # Handle "Save Login Info" popup if it appears
             try:
@@ -101,41 +107,115 @@ class InstagramAutomation:
             print("Clicked 'Not now' on save login info prompt.")
         except TimeoutException as e:
             print("error : {e}")
+
+    def open_inbox(self):
+        try:
+            url = self.driver.current_url
+            inbox_url = f"{url}/direct/inbox"
+            self.driver.get(inbox_url)
+            #print("got url")
+        except:
+            print("dint work bro")
+
+    def go_to_account(self, account):
+        try:
+            url = self.driver.current_url
+            account_url = f"{url}{account}"
+            self.driver.get(account_url)
+            time.sleep(2)
+        except:
+            print("didnt work bro")
+
+    def message_viewed_account(self):
+        try:
+            message_button = self.wait.until(
+                EC.element_to_be_clickable((By.XPATH, "//div[text()='Message' or text()='Message']"))
+            )
+            message_button.click()
+            time.sleep(3)
+            self.driver.refresh()
+            time.sleep(2)
+            print("clicked on message")
+        except TimeoutException as e:
+            print(f"dint work bro {e}")
+
+    def send_message(self, meassage="hello"):
+        try:
+            
+            actions = ActionChains(self.driver)
+            actions.send_keys(meassage)  # Send keys to the active element (usually the body)
+            actions.perform()
+            print("sent keys")
+            actions.send_keys(Keys.ENTER) # Send Tab key
+            actions.perform()
+            print("sent enter")
+        except:
+            print("dint work bro")
+
+
+    def send_100_message(self, message="hello"):
+        actions = ActionChains(self.driver)
+        try:
+            x = 0
+            while (x < 100):
+                print("in the while")
+                actions.send_keys(message)  # Send keys to the active element (usually the body)
+                actions.perform()
+                actions.send_keys(Keys.ENTER) # Send Tab key
+                actions.perform()
+                x = x + 1
+                time.sleep(0.5)
+        except:
+            print("dint work")
+
+    def open_most_recent_post(self):
+        actions = ActionChains(self.driver)
+        try:
+            actions.pointer_action.move_to_location(0, 0)
+            actions.perform()
+            print("moved to top left corner")
+            
+        except:
+            print("brok it")
+
+
+    # try search for kier and send him a myself, use a combination of url, like https://www.instagram.com/kier.struthers/
+    # then use the button "meassage"        
     
     
     def close(self):
-        """Close the browser."""
         print("Closing browser...")
         self.driver.quit()
 
 
 def main():
+
+
     # Replace with your Instagram credentials
     username = "sheffskatesoc"
     password = "j£h38qH/65f"
-    
-    # Replace with the account you want to check
-    account_to_check = "sluggerskatestore"
-    
-    # Number of posts to view
-    num_posts = 3
     
     # Initialize the automation
     instagram_bot = InstagramAutomation(username, password)
     
     try:
+        
         # Perform the actions
         if instagram_bot.login():
             time.sleep(1)  # Wait a moment after login
 
             instagram_bot.dont_save_login()
+            instagram_bot.go_to_account("kier.struthers")
+            instagram_bot.message_viewed_account()
+            instagram_bot.send_message()
+            instagram_bot.open_most_recent_post()
         
     except Exception as e:
         print(f"An error occurred: {e}")
     
     finally:
         # Wait for a moment before closing
-        time.sleep(5)
+        time.sleep(50)
         instagram_bot.close()
 
 
